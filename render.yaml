@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: ecommerce-inventory-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      - key: DATABASE_URL
+        sync: false # paste your Supabase pooler connection string in the Render dashboard
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false # your Gmail address
+      - key: SMTP_PASSWORD
+        sync: false # your Gmail app password
+      - key: ADMIN_EMAIL
+        sync: false # where low-stock alerts are sent
+      - key: LOW_STOCK_THRESHOLD
+        value: "5"
+      - key: APP_URL
+        sync: false # set to your Render URL after first deploy, e.g. https://ecommerce-inventory-api.onrender.com
