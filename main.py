@@ -9,6 +9,14 @@ if sys.platform == 'win32':
 # Load .env FIRST — before any local module reads os.getenv()
 load_dotenv(override=True)
 
+# Strip stray whitespace/newlines that sneak in when values are
+# copy-pasted into hosting dashboards (e.g. Render env vars)
+for _key in ("DATABASE_URL", "SECRET_KEY", "ALGORITHM", "ACCESS_TOKEN_EXPIRE_MINUTES",
+             "SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASSWORD",
+             "APP_URL", "ADMIN_EMAIL", "LOW_STOCK_THRESHOLD"):
+    if os.environ.get(_key):
+        os.environ[_key] = os.environ[_key].strip()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
