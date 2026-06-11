@@ -561,6 +561,34 @@ def send_seller_order_notification(
 
 
 def send_email(subject: str, html_body: str, recipient: str) -> None:
+    # Hosts like Render block outbound SMTP ports on free plans, so prefer
+    # Brevo's HTTPS API when a key is configured; SMTP remains the fallback.
+    brevo_key = os.getenv("BREVO_API_KEY", "").strip()
+    sender    = os.getenv("SMTP_USER", "")
+    if brevo_key and sender and recipient:
+        try:
+            import httpx
+            resp = httpx.post(
+                "https://api.brevo.com/v3/smtp/email",
+                headers={"api-key": brevo_key, "content-type": "application/json"},
+                json={
+                    "sender": {"name": "EcomInventory Pro", "email": sender},
+                    "to": [{"email": recipient}],
+                    "subject": subject,
+                    "htmlContent": html_body,
+                },
+                timeout=15,
+            )
+            if resp.status_code in (200, 201):
+                print(f"[EMAIL] Sent OK via Brevo -> {recipient} | {subject}", flush=True)
+                return
+            print(
+                f"[EMAIL ERROR] Brevo {resp.status_code}: {resp.text} — trying SMTP",
+                flush=True,
+            )
+        except Exception as exc:
+            print(f"[EMAIL ERROR] Brevo failed: {exc} — trying SMTP", flush=True)
+
     smtp_host     = os.getenv("SMTP_HOST", "")
     smtp_port     = int(os.getenv("SMTP_PORT", "587"))
     smtp_user     = os.getenv("SMTP_USER", "")
