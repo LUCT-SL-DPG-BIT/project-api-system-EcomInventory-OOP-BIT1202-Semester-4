@@ -68,7 +68,7 @@ ecommerce-inventory-api/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/<your-org>/ecommerce-inventory-api.git
+git clone https://github.com/LUCT-SL-DPG-BIT/project-api-system-EcomInventory-OOP-BIT1202-Semester-4.git
 cd ecommerce-inventory-api
 ```
 
